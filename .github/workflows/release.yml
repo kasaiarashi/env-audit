@@ -66,6 +66,13 @@ jobs:
         with:
           path: artifacts
 
+      - name: Rename artifacts
+        run: |
+          mv artifacts/env-audit-linux-x64/env-audit artifacts/env-audit-linux-x64
+          mv artifacts/env-audit-windows-x64.exe/env-audit.exe artifacts/env-audit-windows-x64.exe
+          mv artifacts/env-audit-macos-x64/env-audit artifacts/env-audit-macos-x64
+          mv artifacts/env-audit-macos-arm64/env-audit artifacts/env-audit-macos-arm64
+
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -73,7 +80,7 @@ jobs:
           gh release create ${{ github.ref_name }} \
             --title "${{ github.ref_name }} - Release" \
             --notes "See [CHANGELOG](https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md) for details." \
-            artifacts/env-audit-linux-x64/env-audit \
-            artifacts/env-audit-windows-x64.exe/env-audit.exe \
-            artifacts/env-audit-macos-x64/env-audit \
-            artifacts/env-audit-macos-arm64/env-audit
+            artifacts/env-audit-linux-x64 \
+            artifacts/env-audit-windows-x64.exe \
+            artifacts/env-audit-macos-x64 \
+            artifacts/env-audit-macos-arm64
