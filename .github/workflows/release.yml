@@ -66,6 +66,14 @@ jobs:
         with:
           path: artifacts
 
+      - name: Prepare release assets
+        run: |
+          mkdir release
+          cp artifacts/env-audit-linux-x64/env-audit release/env-audit-linux-x64
+          cp artifacts/env-audit-windows-x64.exe/env-audit.exe release/env-audit-windows-x64.exe
+          cp artifacts/env-audit-macos-x64/env-audit release/env-audit-macos-x64
+          cp artifacts/env-audit-macos-arm64/env-audit release/env-audit-macos-arm64
+
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -73,7 +81,7 @@ jobs:
           gh release create ${{ github.ref_name }} \
             --title "${{ github.ref_name }} - Release" \
             --notes "See [CHANGELOG](https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md) for details." \
-            artifacts/env-audit-linux-x64/env-audit#env-audit-linux-x64 \
-            artifacts/env-audit-windows-x64.exe/env-audit.exe#env-audit-windows-x64.exe \
-            artifacts/env-audit-macos-x64/env-audit#env-audit-macos-x64 \
-            artifacts/env-audit-macos-arm64/env-audit#env-audit-macos-arm64
+            release/env-audit-linux-x64 \
+            release/env-audit-windows-x64.exe \
+            release/env-audit-macos-x64 \
+            release/env-audit-macos-arm64
