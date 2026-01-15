@@ -2,38 +2,32 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::path::Path;
 
-use crate::types::{EnvVarUsage, Language};
 use super::LanguageScanner;
+use crate::types::{EnvVarUsage, Language};
 
 /// Scanner for Python files
 pub struct PythonScanner;
 
 // Patterns for detecting env var usage in Python
-static OS_ENVIRON_BRACKET: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"os\.environ\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap()
-});
+static OS_ENVIRON_BRACKET: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"os\.environ\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap());
 
-static OS_ENVIRON_GET: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"os\.environ\.get\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap()
-});
+static OS_ENVIRON_GET: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"os\.environ\.get\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap());
 
-static OS_GETENV: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"os\.getenv\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap()
-});
+static OS_GETENV: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"os\.getenv\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap());
 
 // When `from os import environ` is used
-static ENVIRON_BRACKET: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"\benviron\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap()
-});
+static ENVIRON_BRACKET: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"\benviron\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap());
 
-static ENVIRON_GET: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"\benviron\.get\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap()
-});
+static ENVIRON_GET: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"\benviron\.get\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap());
 
 // When `from os import getenv` is used
-static GETENV_DIRECT: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"\bgetenv\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap()
-});
+static GETENV_DIRECT: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"\bgetenv\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap());
 
 impl PythonScanner {
     pub fn new() -> Self {

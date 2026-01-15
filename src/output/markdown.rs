@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::types::{IssueKind, ScanReport, Severity};
 use super::OutputFormatter;
+use crate::types::{IssueKind, ScanReport, Severity};
 
 pub struct MarkdownOutput;
 
@@ -34,19 +34,40 @@ impl OutputFormatter for MarkdownOutput {
 
         // Summary
         output.push_str("## Summary\n\n");
-        output.push_str(&format!("- **Files scanned:** {}\n", report.summary.files_scanned));
-        output.push_str(&format!("- **Env files found:** {}\n", report.summary.env_files_found));
-        output.push_str(&format!("- **Variables defined:** {}\n", report.summary.vars_defined));
-        output.push_str(&format!("- **Variables used:** {}\n", report.summary.vars_used));
-        output.push_str(&format!("- **Scan duration:** {}ms\n\n", report.scan_duration_ms));
+        output.push_str(&format!(
+            "- **Files scanned:** {}\n",
+            report.summary.files_scanned
+        ));
+        output.push_str(&format!(
+            "- **Env files found:** {}\n",
+            report.summary.env_files_found
+        ));
+        output.push_str(&format!(
+            "- **Variables defined:** {}\n",
+            report.summary.vars_defined
+        ));
+        output.push_str(&format!(
+            "- **Variables used:** {}\n",
+            report.summary.vars_used
+        ));
+        output.push_str(&format!(
+            "- **Scan duration:** {}ms\n\n",
+            report.scan_duration_ms
+        ));
 
         // Issues summary
         output.push_str("### Issues\n\n");
-        output.push_str(&format!("| Severity | Count |\n"));
-        output.push_str(&format!("|----------|-------|\n"));
+        output.push_str("| Severity | Count |\n");
+        output.push_str("|----------|-------|\n");
         output.push_str(&format!("| :x: Errors | {} |\n", report.summary.errors));
-        output.push_str(&format!("| :warning: Warnings | {} |\n", report.summary.warnings));
-        output.push_str(&format!("| :information_source: Info | {} |\n\n", report.summary.infos));
+        output.push_str(&format!(
+            "| :warning: Warnings | {} |\n",
+            report.summary.warnings
+        ));
+        output.push_str(&format!(
+            "| :information_source: Info | {} |\n\n",
+            report.summary.infos
+        ));
 
         if report.issues.is_empty() {
             output.push_str("> **No issues found!** :tada:\n");
@@ -54,30 +75,44 @@ impl OutputFormatter for MarkdownOutput {
         }
 
         // Group issues by kind
-        let missing: Vec<_> = report.issues.iter()
+        let missing: Vec<_> = report
+            .issues
+            .iter()
             .filter(|i| i.kind == IssueKind::MissingEnvVar)
             .collect();
-        let unused: Vec<_> = report.issues.iter()
+        let unused: Vec<_> = report
+            .issues
+            .iter()
             .filter(|i| i.kind == IssueKind::UnusedEnvVar)
             .collect();
-        let naming: Vec<_> = report.issues.iter()
+        let naming: Vec<_> = report
+            .issues
+            .iter()
             .filter(|i| i.kind == IssueKind::InconsistentNaming)
             .collect();
 
         // Missing env vars
         if !missing.is_empty() {
             output.push_str("## Missing Environment Variables\n\n");
-            output.push_str("These variables are used in code but not defined in any `.env` file.\n\n");
+            output.push_str(
+                "These variables are used in code but not defined in any `.env` file.\n\n",
+            );
             output.push_str("| | Variable | Used In |\n");
             output.push_str("|---|----------|----------|\n");
 
             for issue in &missing {
-                let locations: Vec<String> = issue.locations.iter()
+                let locations: Vec<String> = issue
+                    .locations
+                    .iter()
                     .take(3)
                     .map(|l| format!("`{}`", l))
                     .collect();
                 let location_str = if issue.locations.len() > 3 {
-                    format!("{} (+{} more)", locations.join(", "), issue.locations.len() - 3)
+                    format!(
+                        "{} (+{} more)",
+                        locations.join(", "),
+                        issue.locations.len() - 3
+                    )
                 } else {
                     locations.join(", ")
                 };
@@ -89,20 +124,21 @@ impl OutputFormatter for MarkdownOutput {
                     location_str
                 ));
             }
-            output.push_str("\n");
+            output.push('\n');
         }
 
         // Unused env vars
         if !unused.is_empty() {
             output.push_str("## Unused Environment Variables\n\n");
-            output.push_str("These variables are defined in `.env` files but never used in code.\n\n");
+            output.push_str(
+                "These variables are defined in `.env` files but never used in code.\n\n",
+            );
             output.push_str("| | Variable | Defined In |\n");
             output.push_str("|---|----------|------------|\n");
 
             for issue in &unused {
-                let locations: Vec<String> = issue.locations.iter()
-                    .map(|l| format!("`{}`", l))
-                    .collect();
+                let locations: Vec<String> =
+                    issue.locations.iter().map(|l| format!("`{}`", l)).collect();
 
                 output.push_str(&format!(
                     "| {} | `{}` | {} |\n",
@@ -111,7 +147,7 @@ impl OutputFormatter for MarkdownOutput {
                     locations.join(", ")
                 ));
             }
-            output.push_str("\n");
+            output.push('\n');
         }
 
         // Naming convention issues
@@ -129,7 +165,7 @@ impl OutputFormatter for MarkdownOutput {
                     issue.suggestion.as_deref().unwrap_or("")
                 ));
             }
-            output.push_str("\n");
+            output.push('\n');
         }
 
         output.push_str("---\n\n");

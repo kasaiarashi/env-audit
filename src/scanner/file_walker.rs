@@ -14,11 +14,10 @@ pub struct FileWalker {
 
 impl FileWalker {
     pub fn new(root: &Path, config: &ScanConfig) -> Self {
-        let languages = config.languages.as_ref().map(|langs| {
-            langs.iter()
-                .filter_map(|l| parse_language(l))
-                .collect()
-        });
+        let languages = config
+            .languages
+            .as_ref()
+            .map(|langs| langs.iter().filter_map(|l| parse_language(l)).collect());
 
         Self {
             root: root.to_path_buf(),
@@ -32,10 +31,10 @@ impl FileWalker {
         let mut files = Vec::new();
 
         let walker = WalkBuilder::new(&self.root)
-            .hidden(false)          // Don't skip hidden files by default
-            .git_ignore(true)       // Respect .gitignore
-            .git_global(true)       // Respect global gitignore
-            .git_exclude(true)      // Respect .git/info/exclude
+            .hidden(false) // Don't skip hidden files by default
+            .git_ignore(true) // Respect .gitignore
+            .git_global(true) // Respect global gitignore
+            .git_exclude(true) // Respect .git/info/exclude
             .build();
 
         for entry in walker {
@@ -118,8 +117,9 @@ impl FileWalker {
                 let pattern_parts: Vec<&str> = pattern.split("**").collect();
                 if pattern_parts.len() == 2 {
                     let middle = pattern_parts[1].trim_matches('/');
-                    if path_str.contains(&format!("/{}/", middle)) ||
-                       path_str.contains(&format!("\\{}\\", middle)) {
+                    if path_str.contains(&format!("/{}/", middle))
+                        || path_str.contains(&format!("\\{}\\", middle))
+                    {
                         return true;
                     }
                 }
@@ -155,14 +155,9 @@ impl FileWalker {
 #[allow(dead_code)]
 pub fn get_language_for_file(path: &Path) -> Option<Language> {
     let ext = path.extension()?.to_str()?.to_lowercase();
-
-    for lang in all_languages() {
-        if lang.extensions().contains(&ext.as_str()) {
-            return Some(lang);
-        }
-    }
-
-    None
+    all_languages()
+        .into_iter()
+        .find(|lang| lang.extensions().contains(&ext.as_str()))
 }
 
 fn all_languages() -> Vec<Language> {

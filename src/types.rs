@@ -197,11 +197,28 @@ impl ScanReport {
     /// Calculate summary statistics from the issues
     pub fn calculate_summary(&mut self) {
         self.summary.total_issues = self.issues.len();
-        self.summary.errors = self.issues.iter().filter(|i| i.severity == Severity::Error).count();
-        self.summary.warnings = self.issues.iter().filter(|i| i.severity == Severity::Warning).count();
-        self.summary.infos = self.issues.iter().filter(|i| i.severity == Severity::Info).count();
+        self.summary.errors = self
+            .issues
+            .iter()
+            .filter(|i| i.severity == Severity::Error)
+            .count();
+        self.summary.warnings = self
+            .issues
+            .iter()
+            .filter(|i| i.severity == Severity::Warning)
+            .count();
+        self.summary.infos = self
+            .issues
+            .iter()
+            .filter(|i| i.severity == Severity::Info)
+            .count();
         self.summary.vars_defined = self.definitions.len();
-        self.summary.vars_used = self.usages.iter().map(|u| &u.name).collect::<std::collections::HashSet<_>>().len();
+        self.summary.vars_used = self
+            .usages
+            .iter()
+            .map(|u| &u.name)
+            .collect::<std::collections::HashSet<_>>()
+            .len();
     }
 }
 

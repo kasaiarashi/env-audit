@@ -63,10 +63,7 @@ pub fn find_naming_issues(
             }
 
             // Deduplicate locations by file and line
-            locations.sort_by(|a, b| {
-                a.file.cmp(&b.file)
-                    .then_with(|| a.line.cmp(&b.line))
-            });
+            locations.sort_by(|a, b| a.file.cmp(&b.file).then_with(|| a.line.cmp(&b.line)));
             locations.dedup_by(|a, b| a.file == b.file && a.line == b.line);
 
             let message = format!(
@@ -99,8 +96,8 @@ pub fn find_naming_issues(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use crate::types::{Language, Severity};
+    use std::path::PathBuf;
 
     fn make_definition(name: &str) -> EnvVarDefinition {
         EnvVarDefinition {

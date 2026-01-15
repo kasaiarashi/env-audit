@@ -1,15 +1,15 @@
-mod terminal;
+mod html;
 mod json;
 mod markdown;
-mod html;
+mod terminal;
 
-pub use terminal::TerminalOutput;
+pub use html::HtmlOutput;
 pub use json::JsonOutput;
 pub use markdown::MarkdownOutput;
-pub use html::HtmlOutput;
+pub use terminal::TerminalOutput;
 
-use std::path::Path;
 use anyhow::Result;
+use std::path::Path;
 
 use crate::types::ScanReport;
 

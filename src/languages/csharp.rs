@@ -2,8 +2,8 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::path::Path;
 
-use crate::types::{EnvVarUsage, Language};
 use super::LanguageScanner;
+use crate::types::{EnvVarUsage, Language};
 
 /// Scanner for C# files
 pub struct CSharpScanner;
@@ -39,10 +39,7 @@ impl LanguageScanner for CSharpScanner {
 
     fn scan(&self, content: &str, file_path: &Path) -> Vec<EnvVarUsage> {
         let mut usages = Vec::new();
-        let patterns: Vec<&Lazy<Regex>> = vec![
-            &ENVIRONMENT_GETENV,
-            &CONFIG_MANAGER,
-        ];
+        let patterns: Vec<&Lazy<Regex>> = vec![&ENVIRONMENT_GETENV, &CONFIG_MANAGER];
 
         for (line_num, line) in content.lines().enumerate() {
             let line_num = line_num + 1;

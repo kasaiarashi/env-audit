@@ -3,7 +3,11 @@ use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(name = "env-audit")]
-#[command(author, version, about = "Scan projects for environment variable issues")]
+#[command(
+    author,
+    version,
+    about = "Scan projects for environment variable issues"
+)]
 #[command(long_about = "env-audit scans your project for:\n\n\
   - Missing env vars: used in code but not defined in .env files\n\
   - Unused env vars: defined in .env but never used in code\n\

@@ -2,27 +2,23 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::path::Path;
 
-use crate::types::{EnvVarUsage, Language};
 use super::LanguageScanner;
+use crate::types::{EnvVarUsage, Language};
 
 /// Scanner for Rust files
 pub struct RustScanner;
 
-static ENV_VAR: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"(?:std::)?env::var\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap()
-});
+static ENV_VAR: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"(?:std::)?env::var\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap());
 
-static ENV_VAR_OS: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"(?:std::)?env::var_os\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap()
-});
+static ENV_VAR_OS: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"(?:std::)?env::var_os\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap());
 
-static ENV_MACRO: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"env!\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap()
-});
+static ENV_MACRO: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"env!\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap());
 
-static OPTION_ENV_MACRO: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"option_env!\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap()
-});
+static OPTION_ENV_MACRO: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"option_env!\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap());
 
 impl RustScanner {
     pub fn new() -> Self {
@@ -49,12 +45,8 @@ impl LanguageScanner for RustScanner {
         let mut usages = Vec::new();
         let mut seen = std::collections::HashSet::new();
 
-        let patterns: Vec<&Lazy<Regex>> = vec![
-            &ENV_VAR,
-            &ENV_VAR_OS,
-            &ENV_MACRO,
-            &OPTION_ENV_MACRO,
-        ];
+        let patterns: Vec<&Lazy<Regex>> =
+            vec![&ENV_VAR, &ENV_VAR_OS, &ENV_MACRO, &OPTION_ENV_MACRO];
 
         for (line_num, line) in content.lines().enumerate() {
             let line_num = line_num + 1;

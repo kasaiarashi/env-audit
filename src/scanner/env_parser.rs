@@ -79,11 +79,10 @@ fn strip_quotes(s: &str) -> String {
     let s = s.trim();
 
     // Check for matching quotes
-    if (s.starts_with('"') && s.ends_with('"')) ||
-       (s.starts_with('\'') && s.ends_with('\'')) {
-        if s.len() >= 2 {
-            return s[1..s.len()-1].to_string();
-        }
+    if ((s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')))
+        && s.len() >= 2
+    {
+        return s[1..s.len() - 1].to_string();
     }
 
     s.to_string()

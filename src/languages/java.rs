@@ -2,19 +2,17 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::path::Path;
 
-use crate::types::{EnvVarUsage, Language};
 use super::LanguageScanner;
+use crate::types::{EnvVarUsage, Language};
 
 /// Scanner for Java files
 pub struct JavaScanner;
 
-static SYSTEM_GETENV: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"System\.getenv\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap()
-});
+static SYSTEM_GETENV: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"System\.getenv\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap());
 
-static SYSTEM_GETPROPERTY: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"System\.getProperty\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap()
-});
+static SYSTEM_GETPROPERTY: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"System\.getProperty\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap());
 
 impl JavaScanner {
     pub fn new() -> Self {
@@ -39,10 +37,7 @@ impl LanguageScanner for JavaScanner {
 
     fn scan(&self, content: &str, file_path: &Path) -> Vec<EnvVarUsage> {
         let mut usages = Vec::new();
-        let patterns: Vec<&Lazy<Regex>> = vec![
-            &SYSTEM_GETENV,
-            &SYSTEM_GETPROPERTY,
-        ];
+        let patterns: Vec<&Lazy<Regex>> = vec![&SYSTEM_GETENV, &SYSTEM_GETPROPERTY];
 
         for (line_num, line) in content.lines().enumerate() {
             let line_num = line_num + 1;

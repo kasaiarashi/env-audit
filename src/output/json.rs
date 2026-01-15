@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::types::ScanReport;
 use super::OutputFormatter;
+use crate::types::ScanReport;
 
 pub struct JsonOutput {
     pub pretty: bool,

@@ -3,27 +3,15 @@ use std::collections::HashSet;
 use crate::types::{EnvVarDefinition, EnvVarUsage, Issue, IssueKind, Location, Severity};
 
 /// Find environment variables that are defined in .env but never used in code
-pub fn find_unused_vars(
-    definitions: &[EnvVarDefinition],
-    usages: &[EnvVarUsage],
-) -> Vec<Issue> {
+pub fn find_unused_vars(definitions: &[EnvVarDefinition], usages: &[EnvVarUsage]) -> Vec<Issue> {
     // Collect all defined var names
-    let defined_names: HashSet<&str> = definitions
-        .iter()
-        .map(|d| d.name.as_str())
-        .collect();
+    let defined_names: HashSet<&str> = definitions.iter().map(|d| d.name.as_str()).collect();
 
     // Collect all used var names
-    let used_names: HashSet<&str> = usages
-        .iter()
-        .map(|u| u.name.as_str())
-        .collect();
+    let used_names: HashSet<&str> = usages.iter().map(|u| u.name.as_str()).collect();
 
     // Find vars that are defined but not used
-    let unused_names: Vec<&str> = defined_names
-        .difference(&used_names)
-        .copied()
-        .collect();
+    let unused_names: Vec<&str> = defined_names.difference(&used_names).copied().collect();
 
     // Create issues for each unused var
     let mut issues = Vec::new();
@@ -47,7 +35,10 @@ pub fn find_unused_vars(
             var_name: name.to_string(),
             message,
             locations,
-            suggestion: Some(format!("Remove {} from your .env file if it's no longer needed", name)),
+            suggestion: Some(format!(
+                "Remove {} from your .env file if it's no longer needed",
+                name
+            )),
         });
     }
 
@@ -57,8 +48,8 @@ pub fn find_unused_vars(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use crate::types::Language;
+    use std::path::PathBuf;
 
     fn make_definition(name: &str) -> EnvVarDefinition {
         EnvVarDefinition {

@@ -1,11 +1,11 @@
-mod javascript;
-mod python;
-mod rust_lang;
-mod go;
-mod ruby;
-mod php;
-mod java;
 mod csharp;
+mod go;
+mod java;
+mod javascript;
+mod php;
+mod python;
+mod ruby;
+mod rust_lang;
 
 use std::path::Path;
 

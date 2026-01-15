@@ -2,24 +2,21 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::path::Path;
 
-use crate::types::{EnvVarUsage, Language};
 use super::LanguageScanner;
+use crate::types::{EnvVarUsage, Language};
 
 /// Scanner for JavaScript and TypeScript files
 pub struct JavaScriptScanner;
 
 // Patterns for detecting env var usage in JS/TS
-static PROCESS_ENV_DOT: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"process\.env\.([A-Z_][A-Z0-9_]*)"#).unwrap()
-});
+static PROCESS_ENV_DOT: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"process\.env\.([A-Z_][A-Z0-9_]*)"#).unwrap());
 
-static PROCESS_ENV_BRACKET: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"process\.env\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap()
-});
+static PROCESS_ENV_BRACKET: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"process\.env\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap());
 
-static IMPORT_META_ENV: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"import\.meta\.env\.([A-Z_][A-Z0-9_]*)"#).unwrap()
-});
+static IMPORT_META_ENV: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"import\.meta\.env\.([A-Z_][A-Z0-9_]*)"#).unwrap());
 
 static DESTRUCTURE_PROCESS_ENV: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r#"(?:const|let|var)\s*\{\s*([^}]+)\s*\}\s*=\s*process\.env"#).unwrap()
@@ -38,9 +35,15 @@ impl JavaScriptScanner {
                 // Handle renaming: VAR_NAME: localName
                 let name = s.split(':').next()?.trim();
                 // Only valid env var names (uppercase with underscores)
-                if name.chars().all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_')
+                if name
+                    .chars()
+                    .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_')
                     && !name.is_empty()
-                    && name.chars().next().map(|c| c.is_ascii_uppercase() || c == '_').unwrap_or(false)
+                    && name
+                        .chars()
+                        .next()
+                        .map(|c| c.is_ascii_uppercase() || c == '_')
+                        .unwrap_or(false)
                 {
                     Some(name.to_string())
                 } else {

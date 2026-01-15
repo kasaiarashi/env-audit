@@ -2,28 +2,24 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::path::Path;
 
-use crate::types::{EnvVarUsage, Language};
 use super::LanguageScanner;
+use crate::types::{EnvVarUsage, Language};
 
 /// Scanner for PHP files
 pub struct PhpScanner;
 
-static GETENV: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"getenv\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap()
-});
+static GETENV: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"getenv\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap());
 
-static DOLLAR_ENV: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"\$_ENV\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap()
-});
+static DOLLAR_ENV: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"\$_ENV\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap());
 
-static DOLLAR_SERVER: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"\$_SERVER\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap()
-});
+static DOLLAR_SERVER: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"\$_SERVER\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap());
 
 // Laravel env() helper
-static LARAVEL_ENV: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"\benv\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap()
-});
+static LARAVEL_ENV: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"\benv\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap());
 
 impl PhpScanner {
     pub fn new() -> Self {
@@ -48,12 +44,7 @@ impl LanguageScanner for PhpScanner {
 
     fn scan(&self, content: &str, file_path: &Path) -> Vec<EnvVarUsage> {
         let mut usages = Vec::new();
-        let patterns: Vec<&Lazy<Regex>> = vec![
-            &GETENV,
-            &DOLLAR_ENV,
-            &DOLLAR_SERVER,
-            &LARAVEL_ENV,
-        ];
+        let patterns: Vec<&Lazy<Regex>> = vec![&GETENV, &DOLLAR_ENV, &DOLLAR_SERVER, &LARAVEL_ENV];
 
         for (line_num, line) in content.lines().enumerate() {
             let line_num = line_num + 1;

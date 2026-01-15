@@ -2,19 +2,17 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::path::Path;
 
-use crate::types::{EnvVarUsage, Language};
 use super::LanguageScanner;
+use crate::types::{EnvVarUsage, Language};
 
 /// Scanner for Ruby files
 pub struct RubyScanner;
 
-static ENV_BRACKET: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"ENV\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap()
-});
+static ENV_BRACKET: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"ENV\[['"]([A-Z_][A-Z0-9_]*)['"]\]"#).unwrap());
 
-static ENV_FETCH: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"ENV\.fetch\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap()
-});
+static ENV_FETCH: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"ENV\.fetch\s*\(\s*['"]([A-Z_][A-Z0-9_]*)['"]"#).unwrap());
 
 impl RubyScanner {
     pub fn new() -> Self {
@@ -39,10 +37,7 @@ impl LanguageScanner for RubyScanner {
 
     fn scan(&self, content: &str, file_path: &Path) -> Vec<EnvVarUsage> {
         let mut usages = Vec::new();
-        let patterns: Vec<&Lazy<Regex>> = vec![
-            &ENV_BRACKET,
-            &ENV_FETCH,
-        ];
+        let patterns: Vec<&Lazy<Regex>> = vec![&ENV_BRACKET, &ENV_FETCH];
 
         for (line_num, line) in content.lines().enumerate() {
             let line_num = line_num + 1;

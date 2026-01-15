@@ -2,8 +2,8 @@ use anyhow::Result;
 use colored::Colorize;
 use comfy_table::{Cell, Color, ContentArrangement, Table};
 
-use crate::types::{IssueKind, ScanReport, Severity};
 use super::OutputFormatter;
+use crate::types::{IssueKind, ScanReport, Severity};
 
 pub struct TerminalOutput {
     pub no_color: bool,
@@ -15,7 +15,10 @@ impl TerminalOutput {
         if no_color {
             colored::control::set_override(false);
         }
-        Self { no_color, show_suggestions }
+        Self {
+            no_color,
+            show_suggestions,
+        }
     }
 
     fn severity_color(&self, severity: Severity) -> Color {
@@ -45,14 +48,11 @@ impl OutputFormatter for TerminalOutput {
         // Summary stats
         output.push_str(&format!(
             "Files scanned: {}  |  Env files: {}  |  Duration: {}ms\n",
-            report.summary.files_scanned,
-            report.summary.env_files_found,
-            report.scan_duration_ms
+            report.summary.files_scanned, report.summary.env_files_found, report.scan_duration_ms
         ));
         output.push_str(&format!(
             "Vars defined: {}  |  Vars used: {}\n\n",
-            report.summary.vars_defined,
-            report.summary.vars_used
+            report.summary.vars_defined, report.summary.vars_used
         ));
 
         if report.issues.is_empty() {
@@ -61,19 +61,29 @@ impl OutputFormatter for TerminalOutput {
         }
 
         // Group issues by kind
-        let missing: Vec<_> = report.issues.iter()
+        let missing: Vec<_> = report
+            .issues
+            .iter()
             .filter(|i| i.kind == IssueKind::MissingEnvVar)
             .collect();
-        let unused: Vec<_> = report.issues.iter()
+        let unused: Vec<_> = report
+            .issues
+            .iter()
             .filter(|i| i.kind == IssueKind::UnusedEnvVar)
             .collect();
-        let naming: Vec<_> = report.issues.iter()
+        let naming: Vec<_> = report
+            .issues
+            .iter()
             .filter(|i| i.kind == IssueKind::InconsistentNaming)
             .collect();
 
         // Missing env vars
         if !missing.is_empty() {
-            output.push_str(&format!("{} ({})\n", "MISSING ENV VARS".red().bold(), missing.len()));
+            output.push_str(&format!(
+                "{} ({})\n",
+                "MISSING ENV VARS".red().bold(),
+                missing.len()
+            ));
 
             let mut table = Table::new();
             table.set_content_arrangement(ContentArrangement::Dynamic);
@@ -84,12 +94,18 @@ impl OutputFormatter for TerminalOutput {
             ]);
 
             for issue in &missing {
-                let locations: Vec<String> = issue.locations.iter()
+                let locations: Vec<String> = issue
+                    .locations
+                    .iter()
                     .take(3)
                     .map(|l| l.to_string())
                     .collect();
                 let location_str = if issue.locations.len() > 3 {
-                    format!("{} (+{} more)", locations.join("\n"), issue.locations.len() - 3)
+                    format!(
+                        "{} (+{} more)",
+                        locations.join("\n"),
+                        issue.locations.len() - 3
+                    )
                 } else {
                     locations.join("\n")
                 };
@@ -106,7 +122,11 @@ impl OutputFormatter for TerminalOutput {
 
         // Unused env vars
         if !unused.is_empty() {
-            output.push_str(&format!("{} ({})\n", "UNUSED ENV VARS".yellow().bold(), unused.len()));
+            output.push_str(&format!(
+                "{} ({})\n",
+                "UNUSED ENV VARS".yellow().bold(),
+                unused.len()
+            ));
 
             let mut table = Table::new();
             table.set_content_arrangement(ContentArrangement::Dynamic);
@@ -117,9 +137,8 @@ impl OutputFormatter for TerminalOutput {
             ]);
 
             for issue in &unused {
-                let locations: Vec<String> = issue.locations.iter()
-                    .map(|l| l.to_string())
-                    .collect();
+                let locations: Vec<String> =
+                    issue.locations.iter().map(|l| l.to_string()).collect();
 
                 table.add_row(vec![
                     Cell::new(self.severity_symbol(issue.severity))
@@ -133,7 +152,11 @@ impl OutputFormatter for TerminalOutput {
 
         // Naming convention issues
         if !naming.is_empty() {
-            output.push_str(&format!("{} ({})\n", "NAMING ISSUES".cyan().bold(), naming.len()));
+            output.push_str(&format!(
+                "{} ({})\n",
+                "NAMING ISSUES".cyan().bold(),
+                naming.len()
+            ));
 
             let mut table = Table::new();
             table.set_content_arrangement(ContentArrangement::Dynamic);
@@ -163,8 +186,16 @@ impl OutputFormatter for TerminalOutput {
 
         output.push_str(&format!(
             "  {}  |  {}  |  {}\n",
-            if report.summary.errors > 0 { errors_str.red().to_string() } else { errors_str },
-            if report.summary.warnings > 0 { warnings_str.yellow().to_string() } else { warnings_str },
+            if report.summary.errors > 0 {
+                errors_str.red().to_string()
+            } else {
+                errors_str
+            },
+            if report.summary.warnings > 0 {
+                warnings_str.yellow().to_string()
+            } else {
+                warnings_str
+            },
             info_str.cyan()
         ));
 

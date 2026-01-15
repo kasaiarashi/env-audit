@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::types::{IssueKind, ScanReport, Severity};
 use super::OutputFormatter;
+use crate::types::{IssueKind, ScanReport, Severity};
 
 pub struct HtmlOutput;
 
@@ -125,13 +125,19 @@ impl OutputFormatter for HtmlOutput {
             output.push_str(r#"    <div class="success"><h2>No issues found!</h2></div>"#);
         } else {
             // Group issues
-            let missing: Vec<_> = report.issues.iter()
+            let missing: Vec<_> = report
+                .issues
+                .iter()
                 .filter(|i| i.kind == IssueKind::MissingEnvVar)
                 .collect();
-            let unused: Vec<_> = report.issues.iter()
+            let unused: Vec<_> = report
+                .issues
+                .iter()
                 .filter(|i| i.kind == IssueKind::UnusedEnvVar)
                 .collect();
-            let naming: Vec<_> = report.issues.iter()
+            let naming: Vec<_> = report
+                .issues
+                .iter()
                 .filter(|i| i.kind == IssueKind::InconsistentNaming)
                 .collect();
 
@@ -139,9 +145,13 @@ impl OutputFormatter for HtmlOutput {
             if !missing.is_empty() {
                 output.push_str("    <h2>Missing Environment Variables</h2>\n");
                 output.push_str("    <table>\n");
-                output.push_str("        <tr><th>Severity</th><th>Variable</th><th>Used In</th></tr>\n");
+                output.push_str(
+                    "        <tr><th>Severity</th><th>Variable</th><th>Used In</th></tr>\n",
+                );
                 for issue in &missing {
-                    let locations: String = issue.locations.iter()
+                    let locations: String = issue
+                        .locations
+                        .iter()
                         .take(3)
                         .map(|l| format!("<span class=\"location\">{}</span>", l))
                         .collect::<Vec<_>>()
@@ -161,9 +171,13 @@ impl OutputFormatter for HtmlOutput {
             if !unused.is_empty() {
                 output.push_str("    <h2>Unused Environment Variables</h2>\n");
                 output.push_str("    <table>\n");
-                output.push_str("        <tr><th>Severity</th><th>Variable</th><th>Defined In</th></tr>\n");
+                output.push_str(
+                    "        <tr><th>Severity</th><th>Variable</th><th>Defined In</th></tr>\n",
+                );
                 for issue in &unused {
-                    let locations: String = issue.locations.iter()
+                    let locations: String = issue
+                        .locations
+                        .iter()
                         .map(|l| format!("<span class=\"location\">{}</span>", l))
                         .collect::<Vec<_>>()
                         .join("<br>");
@@ -182,7 +196,9 @@ impl OutputFormatter for HtmlOutput {
             if !naming.is_empty() {
                 output.push_str("    <h2>Naming Convention Issues</h2>\n");
                 output.push_str("    <table>\n");
-                output.push_str("        <tr><th>Severity</th><th>Variable</th><th>Suggestion</th></tr>\n");
+                output.push_str(
+                    "        <tr><th>Severity</th><th>Variable</th><th>Suggestion</th></tr>\n",
+                );
                 for issue in &naming {
                     output.push_str(&format!(
                         "        <tr><td><span class=\"severity {}\">{}</span></td><td class=\"var-name\">{}</td><td>{}</td></tr>\n",

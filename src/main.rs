@@ -3,11 +3,11 @@ use std::time::Instant;
 use anyhow::{Context, Result};
 use clap::Parser;
 
+use env_audit::analysis::analyze;
 use env_audit::cli::{Cli, Commands, OutputFormat, ScanArgs};
 use env_audit::config::Config;
+use env_audit::output::{HtmlOutput, JsonOutput, MarkdownOutput, OutputFormatter, TerminalOutput};
 use env_audit::scanner::{parse_env_file, CodeScanner, FileWalker};
-use env_audit::analysis::analyze;
-use env_audit::output::{OutputFormatter, TerminalOutput, JsonOutput, MarkdownOutput, HtmlOutput};
 use env_audit::types::{ScanReport, Severity};
 
 fn main() -> Result<()> {
@@ -64,16 +64,16 @@ fn cmd_check(cli: &Cli, args: &env_audit::cli::CheckArgs) -> Result<()> {
     let fail_severity: Severity = args.fail_on.into();
 
     // Count issues at or above the fail severity
-    let failing_issues = report.issues.iter()
+    let failing_issues = report
+        .issues
+        .iter()
         .filter(|i| i.severity >= fail_severity)
         .count();
 
     if args.summary {
         println!(
             "Errors: {}  Warnings: {}  Info: {}",
-            report.summary.errors,
-            report.summary.warnings,
-            report.summary.infos
+            report.summary.errors, report.summary.warnings, report.summary.infos
         );
     } else {
         let output = format_output(&report, cli)?;
@@ -99,7 +99,12 @@ fn cmd_list(cli: &Cli, args: &env_audit::cli::ListArgs) -> Result<()> {
             let definitions = parse_env_file(&env_file)?;
             for def in definitions {
                 if args.locations {
-                    println!("  {} ({}:{})", def.name, def.source_file.display(), def.line);
+                    println!(
+                        "  {} ({}:{})",
+                        def.name,
+                        def.source_file.display(),
+                        def.line
+                    );
                 } else {
                     println!("  {}", def.name);
                 }
@@ -118,7 +123,12 @@ fn cmd_list(cli: &Cli, args: &env_audit::cli::ListArgs) -> Result<()> {
         for usage in usages {
             if seen.insert(usage.name.clone()) {
                 if args.locations {
-                    println!("  {} ({}:{})", usage.name, usage.file_path.display(), usage.line);
+                    println!(
+                        "  {} ({}:{})",
+                        usage.name,
+                        usage.file_path.display(),
+                        usage.line
+                    );
                 } else {
                     println!("  {}", usage.name);
                 }
@@ -143,7 +153,11 @@ fn cmd_compare(cli: &Cli, args: &env_audit::cli::CompareArgs) -> Result<()> {
     let only_in_2: Vec<_> = names2.difference(&names1).collect();
     let in_both: Vec<_> = names1.intersection(&names2).collect();
 
-    println!("Comparing {} and {}\n", args.file1.display(), args.file2.display());
+    println!(
+        "Comparing {} and {}\n",
+        args.file1.display(),
+        args.file2.display()
+    );
 
     if !only_in_1.is_empty() {
         println!("Only in {}:", args.file1.display());
@@ -166,8 +180,14 @@ fn cmd_compare(cli: &Cli, args: &env_audit::cli::CompareArgs) -> Result<()> {
     if args.show_values {
         println!("\nValues comparison:");
         for name in in_both {
-            let val1 = defs1.iter().find(|d| &d.name == *name).and_then(|d| d.value.as_ref());
-            let val2 = defs2.iter().find(|d| &d.name == *name).and_then(|d| d.value.as_ref());
+            let val1 = defs1
+                .iter()
+                .find(|d| &d.name == *name)
+                .and_then(|d| d.value.as_ref());
+            let val2 = defs2
+                .iter()
+                .find(|d| &d.name == *name)
+                .and_then(|d| d.value.as_ref());
             if val1 != val2 {
                 println!("  {} differs:", name);
                 println!("    {}: {:?}", args.file1.display(), val1);

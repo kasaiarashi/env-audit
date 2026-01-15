@@ -33,12 +33,7 @@ impl CodeScanner {
     pub fn scan_files(&self, files: &[PathBuf]) -> Vec<EnvVarUsage> {
         files
             .par_iter()
-            .filter_map(|path| {
-                match self.scan_file(path) {
-                    Ok(usages) => Some(usages),
-                    Err(_) => None,
-                }
-            })
+            .filter_map(|path| self.scan_file(path).ok())
             .flatten()
             .collect()
     }

@@ -2,23 +2,20 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::path::Path;
 
-use crate::types::{EnvVarUsage, Language};
 use super::LanguageScanner;
+use crate::types::{EnvVarUsage, Language};
 
 /// Scanner for Go files
 pub struct GoScanner;
 
-static OS_GETENV: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"os\.Getenv\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap()
-});
+static OS_GETENV: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"os\.Getenv\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap());
 
-static OS_LOOKUP_ENV: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"os\.LookupEnv\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap()
-});
+static OS_LOOKUP_ENV: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"os\.LookupEnv\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap());
 
-static OS_SETENV: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"os\.Setenv\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap()
-});
+static OS_SETENV: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"os\.Setenv\s*\(\s*"([A-Z_][A-Z0-9_]*)""#).unwrap());
 
 impl GoScanner {
     pub fn new() -> Self {
@@ -43,11 +40,7 @@ impl LanguageScanner for GoScanner {
 
     fn scan(&self, content: &str, file_path: &Path) -> Vec<EnvVarUsage> {
         let mut usages = Vec::new();
-        let patterns: Vec<&Lazy<Regex>> = vec![
-            &OS_GETENV,
-            &OS_LOOKUP_ENV,
-            &OS_SETENV,
-        ];
+        let patterns: Vec<&Lazy<Regex>> = vec![&OS_GETENV, &OS_LOOKUP_ENV, &OS_SETENV];
 
         for (line_num, line) in content.lines().enumerate() {
             let line_num = line_num + 1;

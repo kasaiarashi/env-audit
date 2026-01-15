@@ -57,9 +57,7 @@ fn default_env_files() -> Vec<String> {
 }
 
 fn default_include() -> Vec<String> {
-    vec![
-        "**/*".to_string(),
-    ]
+    vec!["**/*".to_string()]
 }
 
 fn default_exclude() -> Vec<String> {
@@ -256,6 +254,7 @@ min_severity = "info"
 
 # Output file path for non-terminal formats (optional)
 # output_file = "env-audit-report.json"
-"#.to_string()
+"#
+        .to_string()
     }
 }

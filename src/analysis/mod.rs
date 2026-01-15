@@ -1,10 +1,10 @@
 mod missing;
-mod unused;
 mod naming;
+mod unused;
 
 pub use missing::find_missing_vars;
-pub use unused::find_unused_vars;
 pub use naming::find_naming_issues;
+pub use unused::find_unused_vars;
 
 use crate::config::Config;
 use crate::rules::get_all_rules;
@@ -26,11 +26,17 @@ pub fn analyze(
 
     // Find naming convention issues
     let rules = get_all_rules(config);
-    issues.extend(find_naming_issues(definitions, usages, &rules, &config.naming.ignore_patterns));
+    issues.extend(find_naming_issues(
+        definitions,
+        usages,
+        &rules,
+        &config.naming.ignore_patterns,
+    ));
 
     // Sort by severity (errors first) then by var name
     issues.sort_by(|a, b| {
-        b.severity.cmp(&a.severity)
+        b.severity
+            .cmp(&a.severity)
             .then_with(|| a.var_name.cmp(&b.var_name))
     });
 
